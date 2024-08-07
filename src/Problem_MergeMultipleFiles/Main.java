@@ -14,12 +14,20 @@ public class Main {
     public static void main(String[] args) {
         Path dirPath = Paths.get("src/TextFile");
         Path source_path = Paths.get("src/Problem_MergeMultipleFiles/final_merge.txt");
-        try (OutputStream outputStream = Files.newOutputStream(source_path, StandardOpenOption.CREATE)) {
+
+        try (OutputStream outputStream = Files.newOutputStream(source_path, StandardOpenOption.TRUNCATE_EXISTING)) {
             Files.list(dirPath).forEach(filePathName -> {
+
                 try (FileInputStream inputStream = new FileInputStream(String.valueOf(filePathName))) {
 
                     FileChannel fileChannel = inputStream.getChannel();
-                    ByteBuffer buff = ByteBuffer.allocate(100);
+
+                    int bufferSize = 1024;
+                    if (bufferSize > fileChannel.size()) {
+                        bufferSize = (int) fileChannel.size();
+                    }
+
+                    ByteBuffer buff = ByteBuffer.allocate(bufferSize);
 
                     fileChannel.read(buff);
 
